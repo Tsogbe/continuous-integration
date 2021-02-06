@@ -12,7 +12,7 @@ blocks:
           - checkout
           - phpbrew --no-progress install 7.3.26
           - sem-version php 7.3.26
-          - apt install composer
+          - sudo apt-get install composer
       jobs:
         - name: composer
           commands:
