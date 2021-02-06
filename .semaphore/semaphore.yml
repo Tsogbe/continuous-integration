@@ -10,11 +10,9 @@ blocks:
       prologue:
         commands:
           - checkout
+          - phpbrew --no-progress install 8.0.2
+          - sem-version php 8.0.2
       jobs:
-        - name: update php version
-          commands:
-            - phpbrew --no-progress install 8.0
-            - sem-version php 8.0
         - name: composer
           commands:
             - checkout
