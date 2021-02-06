@@ -10,8 +10,8 @@ blocks:
       prologue:
         commands:
           - checkout
-          - phpbrew --no-progress install 7.3.27
-          - sem-version php 7.3.27
+          - phpbrew --no-progress install 7.3.26
+          - sem-version php 7.3.26
       jobs:
         - name: composer
           commands:
