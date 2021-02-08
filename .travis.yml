@@ -1,6 +1,6 @@
 language: php
 php:
-  -7.2.34
+  -7.0
 before_script:
   - mkdir bootstrap/cache
   - cp .env.travis .env
