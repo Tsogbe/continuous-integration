@@ -1,0 +1,69 @@
+version: v1.0
+name: First pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Install Dependencies
+    task:
+      prologue:
+        commands:
+          - checkout
+          - phpbrew --no-progress install 7.3.26
+          - sem-version php 7.3.26
+          - sudo apt-get install composer
+      jobs:
+        - name: composer
+          commands:
+            - checkout
+            - cache restore
+            - composer install
+            - npm install
+            - cache store
+            - cp .env.example .env
+            - 'php artisan key:generate'
+  - name: Run code Analysis
+    task:
+      prologue:
+        commands:
+          - checkout
+          - cache restore
+      jobs:
+        - name: phpmd
+          commands:
+            - php phpmd.phar app ansi controversial
+        - name: phpcs
+          commands:
+            - php vendor/bin/phpcs app --report-full --standard=PEAR
+        - name: phpcpd
+          commands:
+            - php phpcpd.phar app
+  - name: Run unit tests
+    task:
+      jobs:
+        - name: phpunit
+          commands:
+            - checkout
+            - cache restore
+            - ./vendor/bin/phpunit
+  - name: Run Browser Test
+    task:
+      jobs:
+        - name: laravel dusk
+          commands:
+            - checkout
+            - touch database/database.sqlite
+            - cache restore
+            - 'php artisan key:generate'
+            - 'php artisan dusk:update --detect'
+            - php artisan serve --env=dusk.local --port=8010 &
+            - php artisan dusk
+  - name: Run Security Test
+    task:
+      jobs:
+        - name: local-php-security-checker
+          commands:
+            - checkout
+            - composer require thibautselingue/local-php-security-checker-installer
+            - ./vendor/bin/local-php-security-checker-installer && ./vendor/bin/local-php-security-checker
